@@ -1,6 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { SearchContext } from "/src/SearchContext";
 
 function Navbar() {
+  const { searchQuery, setSearchQuery } = useContext(SearchContext);
   const navLinkClass = ({ isActive }) =>
     isActive ? "nav-link nav-link-active" : "nav-link";
 
@@ -18,7 +21,9 @@ function Navbar() {
           <label className="search-field" aria-label="Search games">
             <input
               type="text"
-              placeholder="Search games, genres, or platforms"
+              placeholder="Search games..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
           </label>
