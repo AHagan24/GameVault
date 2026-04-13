@@ -1,19 +1,24 @@
 :root {
   font-family: "Segoe UI", "Inter", sans-serif;
-  color: #f5f7fb;
-  background: #0f0f0f;
+  color: #eef2f7;
+  background: #181b21;
   color-scheme: dark;
-  --bg-primary: #0f0f0f;
-  --bg-elevated: rgba(22, 22, 24, 0.92);
-  --bg-input: #15161a;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(124, 92, 255, 0.38);
-  --text-primary: #f5f7fb;
-  --text-muted: #a7afc3;
-  --text-soft: #7f8799;
+
+  --bg-primary: #181b21;
+  --bg-elevated: rgba(30, 34, 42, 0.94);
+  --bg-input: #222733;
+
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(139, 92, 246, 0.42);
+
+  --text-primary: #eef2f7;
+  --text-muted: #bcc4d4;
+  --text-soft: #8f98ab;
+
   --accent: #8b5cf6;
   --accent-strong: #a78bfa;
-  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.28);
+
+  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.2);
 }
 
 * {
@@ -29,8 +34,8 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 28%),
-    var(--bg-primary);
+    radial-gradient(circle at top, rgba(139, 92, 246, 0.1), transparent 30%),
+    linear-gradient(180deg, #1a1d24 0%, #181b21 100%);
   color: var(--text-primary);
 }
 
@@ -63,7 +68,11 @@ video {
   top: 0;
   z-index: 20;
   padding: 18px 24px 0;
-  background: linear-gradient(180deg, rgba(15, 15, 15, 0.94), rgba(15, 15, 15, 0.68));
+  background: linear-gradient(
+    180deg,
+    rgba(15, 15, 15, 0.94),
+    rgba(15, 15, 15, 0.68)
+  );
   backdrop-filter: blur(14px);
 }
 
@@ -111,7 +120,9 @@ video {
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.03em;
-  transition: color 180ms ease, transform 180ms ease;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .logo:hover {
@@ -388,7 +399,11 @@ video {
 .skeleton-hero {
   background:
     linear-gradient(135deg, rgba(18, 20, 30, 0.96), rgba(12, 14, 22, 0.94)),
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), transparent 34%);
+    radial-gradient(
+      circle at top right,
+      rgba(139, 92, 246, 0.16),
+      transparent 34%
+    );
 }
 
 .skeleton-eyebrow {
@@ -541,7 +556,9 @@ video {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #fff;
   font-weight: 700;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   box-shadow: 0 12px 24px rgba(139, 92, 246, 0.28);
 }
 
@@ -575,7 +592,11 @@ video {
 
 .home-section-popular {
   background:
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.12), transparent 28%),
+    radial-gradient(
+      circle at top right,
+      rgba(139, 92, 246, 0.12),
+      transparent 28%
+    ),
     linear-gradient(180deg, rgba(22, 22, 24, 0.94), rgba(14, 14, 18, 0.96));
 }
 
@@ -650,7 +671,11 @@ video {
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.01)
+    ),
     rgba(16, 18, 24, 0.9);
 }
 
@@ -679,8 +704,16 @@ video {
   border: 1px solid rgba(167, 139, 250, 0.22);
   border-radius: 28px;
   background:
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.16), transparent 28%),
-    radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.18), transparent 36%),
+    radial-gradient(
+      circle at top right,
+      rgba(56, 189, 248, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(139, 92, 246, 0.18),
+      transparent 36%
+    ),
     linear-gradient(135deg, rgba(16, 18, 24, 0.98), rgba(24, 22, 34, 0.98));
   box-shadow: var(--shadow-soft);
 }
@@ -725,7 +758,9 @@ video {
 
 .site-footer-nav a {
   color: var(--text-muted);
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .site-footer-nav a:hover {
@@ -770,7 +805,9 @@ video {
   color: var(--text-primary);
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .games-genre-select:focus {
@@ -795,8 +832,8 @@ video {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #1b1b1b;
-  border: 1px solid #2a2a2a;
+  background: #232833;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   overflow: hidden;
   transition:
@@ -824,8 +861,11 @@ video {
   align-items: center;
   justify-content: center;
   padding: 18px;
-  background:
-    linear-gradient(135deg, rgba(40, 40, 46, 0.96), rgba(24, 24, 28, 0.98));
+  background: linear-gradient(
+    135deg,
+    rgba(40, 40, 46, 0.96),
+    rgba(24, 24, 28, 0.98)
+  );
   color: var(--text-muted);
   text-align: center;
 }
@@ -864,7 +904,9 @@ video {
   color: white;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .favorite-button:hover {
@@ -881,7 +923,9 @@ video {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .details-favorite-button:hover {
@@ -994,7 +1038,9 @@ video {
   background: rgba(139, 92, 246, 0.18);
   color: var(--text-primary);
   font-weight: 600;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .trailer-link:hover {
