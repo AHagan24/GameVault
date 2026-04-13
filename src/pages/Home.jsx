@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
 import GameCard from "../components/GameCard";
+import SkeletonCard from "../components/SkeletonCard";
+import SkeletonHero from "../components/SkeletonHero";
 import { fetchFeaturedGames, fetchGames } from "../services/api";
 
 function Home() {
@@ -60,7 +62,33 @@ function Home() {
   }, [featuredGames]);
 
   if (loading) {
-    return <section className="hero-status">Loading featured games...</section>;
+    return (
+      <>
+        <SkeletonHero />
+
+        <section className="home-section home-section-popular">
+          <div className="home-section-header">
+            <div>
+              <p className="home-section-eyebrow">Browse</p>
+              <h2>Popular Right Now</h2>
+              <p className="home-section-copy">
+                A quick look at standout titles worth jumping into next.
+              </p>
+            </div>
+
+            <Link to="/games" className="home-section-link">
+              Browse All Games
+            </Link>
+          </div>
+
+          <div className="games-grid games-grid-compact">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        </section>
+      </>
+    );
   }
 
   if (error) {
@@ -123,7 +151,11 @@ function Home() {
         </div>
 
         {popularLoading ? (
-          <div className="games-empty-state">Loading popular games...</div>
+          <div className="games-grid games-grid-compact">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
         ) : popularError ? (
           <div className="games-empty-state">{popularError}</div>
         ) : (

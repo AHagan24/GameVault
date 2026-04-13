@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import SkeletonDetails from "../components/SkeletonDetails";
 import { FavoritesContext } from "../context/FavoritesContext";
 import {
   fetchGameDetails,
@@ -81,7 +82,7 @@ function GameDetails() {
     loadScreenshots();
   }, [id, trailers, trailersLoading]);
 
-  if (loading) return <h2>Loading game...</h2>;
+  if (loading) return <SkeletonDetails />;
   if (error) return <h2>{error}</h2>;
   if (!game) return <h2>No game found.</h2>;
 

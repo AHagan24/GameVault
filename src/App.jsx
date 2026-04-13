@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Games from "./pages/Games";
@@ -8,6 +8,17 @@ import Navbar from "./components/Navbar";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [searchQuery]);
 
   return (
     <BrowserRouter>
@@ -22,7 +33,10 @@ function App() {
       >
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/games" element={<Games searchQuery={searchQuery} />} />
+          <Route
+            path="/games"
+            element={<Games debouncedSearchQuery={debouncedSearchQuery} />}
+          />
           <Route path="/games/:id" element={<GameDetails />} />
           <Route path="/favorites" element={<Favorites />} />
         </Routes>

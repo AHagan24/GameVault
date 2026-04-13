@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import GameCard from "../components/GameCard";
+import SkeletonCard from "../components/SkeletonCard";
 import { fetchGames } from "../services/api";
 
-function Games({ searchQuery }) {
+function Games({ debouncedSearchQuery }) {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,7 +25,7 @@ function Games({ searchQuery }) {
     loadGames();
   }, []);
 
-  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const normalizedQuery = debouncedSearchQuery.trim().toLowerCase();
   const genreOptions = useMemo(() => {
     const uniqueGenres = new Set();
 
@@ -49,7 +50,24 @@ function Games({ searchQuery }) {
   });
 
   if (loading) {
-    return <h2>Loading games...</h2>;
+    return (
+      <section className="games-page">
+        <div className="games-filters">
+          <div>
+            <p className="games-filters-label">Filter by genre</p>
+            <div className="games-genre-select skeleton-block skeleton-select" />
+          </div>
+
+          <div className="skeleton-block skeleton-line skeleton-line-short" />
+        </div>
+
+        <div className="games-grid">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      </section>
+    );
   }
 
   if (error) {
