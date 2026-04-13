@@ -4,15 +4,29 @@ export const FavoritesContext = createContext();
 
 export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState(() => {
-    const storedFavorites = localStorage.getItem("favorites");
-    return storedFavorites ? JSON.parse(storedFavorites) : [];
+    try {
+      const storedFavorites = localStorage.getItem("favorites");
+      const parsedFavorites = storedFavorites ? JSON.parse(storedFavorites) : [];
+      return Array.isArray(parsedFavorites) ? parsedFavorites : [];
+    } catch (error) {
+      console.error("Failed to read favorites from localStorage.", error);
+      return [];
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+    try {
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+    } catch (error) {
+      console.error("Failed to save favorites to localStorage.", error);
+    }
   }, [favorites]);
 
   function addFavorite(game) {
+    if (!game?.id) {
+      return;
+    }
+
     setFavorites((prev) => {
       const alreadyExists = prev.some((item) => item.id === game.id);
       if (alreadyExists) return prev;

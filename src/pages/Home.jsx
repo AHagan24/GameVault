@@ -16,35 +16,59 @@ function Home() {
   const [popularError, setPopularError] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadFeaturedGames() {
       try {
-        const games = await fetchFeaturedGames();
+        const games = await fetchFeaturedGames(controller.signal);
         setFeaturedGames(games);
       } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
         console.error(err);
         setError("Failed to load featured games.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
     loadFeaturedGames();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadPopularGames() {
       try {
-        const games = await fetchGames();
+        const games = await fetchGames(controller.signal);
         setPopularGames(games.slice(0, 3));
       } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
         console.error(err);
         setPopularError("Failed to load popular games.");
       } finally {
-        setPopularLoading(false);
+        if (!controller.signal.aborted) {
+          setPopularLoading(false);
+        }
       }
     }
 
     loadPopularGames();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   useEffect(() => {
@@ -82,7 +106,7 @@ function Home() {
           </div>
 
           <div className="games-grid games-grid-compact">
-            {Array.from({ length: 4 }).map((_, index) => (
+            {Array.from({ length: 3 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
@@ -152,12 +176,16 @@ function Home() {
 
         {popularLoading ? (
           <div className="games-grid games-grid-compact">
-            {Array.from({ length: 4 }).map((_, index) => (
+            {Array.from({ length: 3 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
         ) : popularError ? (
           <div className="games-empty-state">{popularError}</div>
+        ) : popularGames.length === 0 ? (
+          <div className="games-empty-state">
+            No popular games are available right now.
+          </div>
         ) : (
           <div className="games-grid games-grid-compact">
             {popularGames.map((game) => (

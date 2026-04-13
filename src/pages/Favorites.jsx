@@ -10,7 +10,10 @@ function Favorites() {
       <h1>Your Favorites</h1>
 
       {favorites.length === 0 ? (
-        <p className="favorites-empty-state">You have no favorite games yet.</p>
+        <p className="favorites-empty-state">
+          You have no favorite games yet. Save a few titles to build your
+          shortlist.
+        </p>
       ) : (
         <div className="games-grid">
           {favorites.map((game) => (

@@ -10,19 +10,31 @@ function Games({ debouncedSearchQuery }) {
   const [selectedGenre, setSelectedGenre] = useState("All Genres");
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadGames() {
       try {
-        const fetchedGames = await fetchGames();
+        const fetchedGames = await fetchGames(controller.signal);
         setGames(fetchedGames);
       } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
         console.error(err);
         setError("Failed to load games.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
     loadGames();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const normalizedQuery = debouncedSearchQuery.trim().toLowerCase();
@@ -37,11 +49,16 @@ function Games({ debouncedSearchQuery }) {
       });
     });
 
-    return ["All Genres", ...Array.from(uniqueGenres).sort((a, b) => a.localeCompare(b))];
+    return [
+      "All Genres",
+      ...Array.from(uniqueGenres).sort((a, b) => a.localeCompare(b)),
+    ];
   }, [games]);
 
   const filteredGames = games.filter((game) => {
-    const matchesSearch = game.name.toLowerCase().includes(normalizedQuery);
+    const matchesSearch = (game.name || "")
+      .toLowerCase()
+      .includes(normalizedQuery);
     const matchesGenre =
       selectedGenre === "All Genres" ||
       game.genres?.some((genre) => genre?.name === selectedGenre);
@@ -71,7 +88,7 @@ function Games({ debouncedSearchQuery }) {
   }
 
   if (error) {
-    return <h2>{error}</h2>;
+    return <section className="hero-status">{error}</section>;
   }
 
   return (
@@ -99,7 +116,9 @@ function Games({ debouncedSearchQuery }) {
 
       {filteredGames.length === 0 ? (
         <div className="games-empty-state">
-          No games match your search and genre filters.
+          {games.length === 0
+            ? "No games are available right now."
+            : "No games match your search and genre filters."}
         </div>
       ) : (
         <div className="games-grid">

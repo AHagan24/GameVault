@@ -10,7 +10,8 @@ import {
 
 function GameDetails() {
   const { id } = useParams();
-  const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
+  const { addFavorite, removeFavorite, isFavorite } =
+    useContext(FavoritesContext);
 
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,45 +24,75 @@ function GameDetails() {
   const [screenshotsError, setScreenshotsError] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadGame() {
+      setLoading(true);
+      setError("");
+      setGame(null);
+
       try {
-        const data = await fetchGameDetails(id);
+        const data = await fetchGameDetails(id, controller.signal);
         setGame(data);
       } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
         console.error(err);
         setError("Failed to load game.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
     loadGame();
+
+    return () => {
+      controller.abort();
+    };
   }, [id]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadTrailers() {
       setTrailersLoading(true);
       setTrailersError("");
       setTrailers([]);
 
       try {
-        const data = await fetchGameTrailers(id);
+        const data = await fetchGameTrailers(id, controller.signal);
         setTrailers(data);
       } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
         console.error(err);
         setTrailersError("Failed to load trailers.");
       } finally {
-        setTrailersLoading(false);
+        if (!controller.signal.aborted) {
+          setTrailersLoading(false);
+        }
       }
     }
 
     loadTrailers();
+
+    return () => {
+      controller.abort();
+    };
   }, [id]);
 
   useEffect(() => {
     if (trailersLoading || trailers.length > 0) {
-      return;
+      return undefined;
     }
+
+    const controller = new AbortController();
 
     async function loadScreenshots() {
       setScreenshotsLoading(true);
@@ -69,24 +100,49 @@ function GameDetails() {
       setScreenshots([]);
 
       try {
-        const data = await fetchGameScreenshots(id);
+        const data = await fetchGameScreenshots(id, controller.signal);
         setScreenshots(data);
       } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
         console.error(err);
         setScreenshotsError("Failed to load screenshots.");
       } finally {
-        setScreenshotsLoading(false);
+        if (!controller.signal.aborted) {
+          setScreenshotsLoading(false);
+        }
       }
     }
 
     loadScreenshots();
+
+    return () => {
+      controller.abort();
+    };
   }, [id, trailers, trailersLoading]);
 
   if (loading) return <SkeletonDetails />;
-  if (error) return <h2>{error}</h2>;
-  if (!game) return <h2>No game found.</h2>;
+  if (error) return <section className="hero-status">{error}</section>;
+  if (!game) return <section className="hero-status">No game found.</section>;
 
   const favorite = isFavorite(game.id);
+  const title = game.name || "Untitled game";
+  const rating =
+    typeof game.rating === "number" ? game.rating.toFixed(1) : "Not rated";
+  const releaseDate = game.released || "TBA";
+  const genres =
+    game.genres
+      ?.map((genre) => genre?.name)
+      .filter(Boolean)
+      .join(", ") || "Not available";
+  const platforms =
+    game.platforms
+      ?.map((platform) => platform?.platform?.name)
+      .filter(Boolean)
+      .join(", ") || "Not available";
+  const description = game.description_raw || "No description available yet.";
 
   function handleFavoriteClick() {
     if (favorite) {
@@ -99,12 +155,12 @@ function GameDetails() {
 
   return (
     <div className="game-details-page">
-      <h1>{game.name}</h1>
+      <h1>{title}</h1>
 
       {game.background_image && (
         <img
           src={game.background_image}
-          alt={game.name}
+          alt={title}
           className="game-details-hero"
         />
       )}
@@ -118,22 +174,21 @@ function GameDetails() {
       </button>
 
       <p>
-        <strong>Rating:</strong> {game.rating}
+        <strong>Rating:</strong> {rating}
       </p>
       <p>
-        <strong>Released:</strong> {game.released}
+        <strong>Released:</strong> {releaseDate}
       </p>
 
       <p>
-        <strong>Genres:</strong> {game.genres?.map((g) => g.name).join(", ")}
+        <strong>Genres:</strong> {genres}
       </p>
 
       <p>
-        <strong>Platforms:</strong>{" "}
-        {game.platforms?.map((p) => p.platform.name).join(", ")}
+        <strong>Platforms:</strong> {platforms}
       </p>
 
-      <p className="game-details-description">{game.description_raw}</p>
+      <p className="game-details-description">{description}</p>
 
       <section className="trailers-section">
         <div className="trailers-section-header">
@@ -145,7 +200,10 @@ function GameDetails() {
         ) : trailers.length > 0 ? (
           <div className="trailers-grid">
             {trailers.map((trailer) => {
-              const videoSrc = trailer.data?.max || trailer.data?.["480"];
+              const videoSrc =
+                trailer.data?.max ||
+                trailer.data?.["480"] ||
+                trailer.data?.["preview"];
 
               return (
                 <article key={trailer.id} className="trailer-card">
@@ -162,7 +220,7 @@ function GameDetails() {
                   ) : trailer.preview ? (
                     <img
                       src={trailer.preview}
-                      alt={trailer.name || `${game.name} trailer`}
+                      alt={trailer.name || `${title} trailer`}
                       className="trailer-video"
                     />
                   ) : null}
@@ -194,7 +252,7 @@ function GameDetails() {
               <article key={screenshot.id} className="screenshot-card">
                 <img
                   src={screenshot.image}
-                  alt={`${game.name} screenshot`}
+                  alt={`${title} screenshot`}
                   className="screenshot-image"
                 />
               </article>

@@ -1,14 +1,20 @@
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { FavoritesContext } from "../context/FavoritesContext";
 
 function GameCard({ game }) {
   const { addFavorite, removeFavorite, isFavorite } =
     useContext(FavoritesContext);
+  const [imageError, setImageError] = useState(false);
 
   if (!game) return null;
 
   const favorite = isFavorite(game.id);
+  const title = game.name || "Untitled game";
+  const rating =
+    typeof game.rating === "number" ? game.rating.toFixed(1) : "Not rated";
+  const releaseDate = game.released || "TBA";
+  const hasImage = Boolean(game.background_image) && !imageError;
 
   function handleFavoriteClick(e) {
     e.preventDefault();
@@ -23,33 +29,30 @@ function GameCard({ game }) {
   return (
     <Link to={`/games/${game.id}`} className="game-card-link">
       <div className="game-card">
-        {game.background_image ? (
+        {hasImage ? (
           <img
             src={game.background_image}
-            alt={game.name}
+            alt={title}
             className="game-card-image"
+            loading="lazy"
+            onError={() => setImageError(true)}
           />
         ) : (
-          <div
-            className="game-card-image"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#222",
-              color: "#aaa",
-            }}
-          >
+          <div className="game-card-image game-card-image-fallback">
             No image available
           </div>
         )}
 
         <div className="game-card-content">
-          <h3>{game.name}</h3>
-          <p>Rating: {game.rating}</p>
-          <p>Released: {game.released}</p>
+          <h3>{title}</h3>
+          <p>Rating: {rating}</p>
+          <p>Released: {releaseDate}</p>
 
-          <button onClick={handleFavoriteClick} className="favorite-button">
+          <button
+            type="button"
+            onClick={handleFavoriteClick}
+            className="favorite-button"
+          >
             {favorite ? "Remove Favorite" : "Add to Favorites"}
           </button>
         </div>

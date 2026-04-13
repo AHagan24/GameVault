@@ -16,12 +16,12 @@ function Navbar({ searchQuery, setSearchQuery }) {
         <div className="navbar-left">
           <Link to="/" className="logo">
             <span className="logo-mark" aria-hidden="true" />
-            <span className="logo-text" onClick={() => navigate("/")}>GameVault</span>
+            <span className="logo-text">GameVault</span>
           </Link>
         </div>
 
         <div className="navbar-center">
-          <form onSubmit={handleSearchSubmit}>
+          <form onSubmit={handleSearchSubmit} role="search">
             <label className="search-field" aria-label="Search games">
               <span className="search-icon" aria-hidden="true">
                 Find
@@ -32,6 +32,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
+                aria-label="Search games"
               />
             </label>
           </form>

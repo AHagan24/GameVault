@@ -295,6 +295,9 @@ video {
   text-align: center;
   color: var(--text-muted);
   font-size: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 22px;
+  background: rgba(18, 18, 22, 0.72);
 }
 
 .skeleton-block {
@@ -779,11 +782,13 @@ video {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.95rem;
+  text-align: right;
 }
 
 .game-card-link {
   text-decoration: none;
   color: white;
+  display: flex;
 }
 
 .game-card {
@@ -794,11 +799,17 @@ video {
   border: 1px solid #2a2a2a;
   border-radius: 14px;
   overflow: hidden;
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
 
 .game-card:hover {
   transform: translateY(-4px);
+  border-color: rgba(167, 139, 250, 0.24);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.26);
 }
 
 .game-card-image {
@@ -808,10 +819,22 @@ video {
   display: block;
 }
 
+.game-card-image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(40, 40, 46, 0.96), rgba(24, 24, 28, 0.98));
+  color: var(--text-muted);
+  text-align: center;
+}
+
 .game-card-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  gap: 10px;
   padding: 16px;
 }
 
@@ -825,8 +848,14 @@ video {
   overflow: hidden;
 }
 
+.game-card-content p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 .favorite-button {
-  margin-top: 12px;
+  margin-top: auto;
   width: 100%;
   padding: 10px 14px;
   border: none;
@@ -866,6 +895,12 @@ video {
 
 .game-details-page {
   padding: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(22, 22, 24, 0.94), rgba(14, 14, 18, 0.96)),
+    rgba(22, 22, 24, 0.92);
+  box-shadow: var(--shadow-soft);
 }
 
 .game-details-page > h1 {
@@ -876,6 +911,16 @@ video {
 
 .game-details-page > :not(.game-details-hero):not(.trailers-section) {
   max-width: 860px;
+}
+
+.game-details-page > p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.game-details-page > p strong {
+  color: var(--text-primary);
 }
 
 .game-details-hero {
@@ -939,6 +984,7 @@ video {
   margin: 0;
   font-size: 1rem;
   line-height: 1.4;
+  flex: 1;
 }
 
 .trailer-link {
@@ -1101,6 +1147,7 @@ video {
 
   .games-results-summary {
     font-size: 0.92rem;
+    text-align: left;
   }
 
   .games-grid {
@@ -1124,7 +1171,8 @@ video {
   }
 
   .game-details-page {
-    padding: 8px 0 0;
+    padding: 20px 16px;
+    border-radius: 20px;
   }
 
   .game-details-page > h1 {

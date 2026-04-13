@@ -1,61 +1,47 @@
 const API_KEY = import.meta.env.VITE_RAWG_API_KEY;
+
+if (!API_KEY) {
+  console.error("Missing RAWG API key");
+}
+
 const BASE_URL = "https://api.rawg.io/api";
 
-export async function fetchGames() {
-  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}`);
+async function fetchFromApi(path, signal) {
+  const response = await fetch(`${BASE_URL}${path}`, { signal });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch games");
+    throw new Error(`Request failed with status ${response.status}`);
   }
 
-  const data = await response.json();
-  return data.results;
+  return response.json();
 }
 
-export async function fetchGameDetails(id) {
-  const response = await fetch(`${BASE_URL}/games/${id}?key=${API_KEY}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch game details");
-  }
-
-  const data = await response.json();
-  return data;
+export async function fetchGames(signal) {
+  const data = await fetchFromApi(`/games?key=${API_KEY}`, signal);
+  return Array.isArray(data.results) ? data.results : [];
 }
 
-export async function fetchGameTrailers(id) {
-  const response = await fetch(`${BASE_URL}/games/${id}/movies?key=${API_KEY}`);
+export async function fetchGameDetails(id, signal) {
+  return fetchFromApi(`/games/${id}?key=${API_KEY}`, signal);
+}
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch game trailers");
-  }
-
-  const data = await response.json();
+export async function fetchGameTrailers(id, signal) {
+  const data = await fetchFromApi(`/games/${id}/movies?key=${API_KEY}`, signal);
   return data.results ?? [];
 }
 
-export async function fetchGameScreenshots(id) {
-  const response = await fetch(
-    `${BASE_URL}/games/${id}/screenshots?key=${API_KEY}`
+export async function fetchGameScreenshots(id, signal) {
+  const data = await fetchFromApi(
+    `/games/${id}/screenshots?key=${API_KEY}`,
+    signal,
   );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch game screenshots");
-  }
-
-  const data = await response.json();
   return data.results ?? [];
 }
 
-export async function fetchFeaturedGames() {
-  const response = await fetch(
-    `${BASE_URL}/games?key=${API_KEY}&ordering=-added&page_size=5`
+export async function fetchFeaturedGames(signal) {
+  const data = await fetchFromApi(
+    `/games?key=${API_KEY}&ordering=-added&page_size=5`,
+    signal,
   );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch featured games");
-  }
-
-  const data = await response.json();
-  return data.results;
+  return Array.isArray(data.results) ? data.results : [];
 }
