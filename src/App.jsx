@@ -24,13 +24,7 @@ function App() {
     <BrowserRouter>
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-      <main
-        style={{
-          width: "min(1200px, 100%)",
-          margin: "24px auto 0",
-          padding: "0 24px 40px",
-        }}
-      >
+      <main className="app-main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route

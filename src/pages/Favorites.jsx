@@ -6,11 +6,11 @@ function Favorites() {
   const { favorites } = useContext(FavoritesContext);
 
   return (
-    <section>
+    <section className="favorites-page">
       <h1>Your Favorites</h1>
 
       {favorites.length === 0 ? (
-        <p>You have no favorite games yet.</p>
+        <p className="favorites-empty-state">You have no favorite games yet.</p>
       ) : (
         <div className="games-grid">
           {favorites.map((game) => (

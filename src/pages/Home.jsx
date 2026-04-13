@@ -35,7 +35,7 @@ function Home() {
     async function loadPopularGames() {
       try {
         const games = await fetchGames();
-        setPopularGames(games.slice(0, 4));
+        setPopularGames(games.slice(0, 3));
       } catch (err) {
         console.error(err);
         setPopularError("Failed to load popular games.");
