@@ -236,6 +236,103 @@ a {
   }
 }
 
+.games-empty-state,
+.hero-status {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  min-height: 460px;
+  margin: 20px 0 8px;
+  padding: 56px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 28px;
+  background-position: center;
+  background-size: cover;
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(12, 14, 22, 0.78), rgba(12, 14, 22, 0.22)),
+    linear-gradient(180deg, rgba(139, 92, 246, 0.1), transparent 35%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 18px;
+  max-width: 560px;
+  min-height: 348px;
+}
+
+.hero-eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero-content h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 0.95;
+}
+
+.hero-copy {
+  margin: 0;
+  color: rgba(245, 247, 251, 0.84);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.hero-meta span {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(11, 13, 18, 0.46);
+  backdrop-filter: blur(8px);
+}
+
+.hero-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 24px rgba(139, 92, 246, 0.28);
+}
+
+.hero-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(139, 92, 246, 0.34);
+}
+
 .games-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -313,4 +410,20 @@ a {
 
 .details-favorite-button.active {
   background: #ef4444;
+}
+
+@media (max-width: 720px) {
+  .hero-section {
+    min-height: 400px;
+    padding: 28px;
+    border-radius: 22px;
+  }
+
+  .hero-content {
+    min-height: 300px;
+  }
+
+  .hero-meta {
+    gap: 10px;
+  }
 }

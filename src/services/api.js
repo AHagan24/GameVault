@@ -22,3 +22,16 @@ export async function fetchGameDetails(id) {
   const data = await response.json();
   return data;
 }
+
+export async function fetchFeaturedGames() {
+  const response = await fetch(
+    `${BASE_URL}/games?key=${API_KEY}&ordering=-added&page_size=5`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch featured games");
+  }
+
+  const data = await response.json();
+  return data.results;
+}

@@ -1,11 +1,14 @@
-import { Link, NavLink } from "react-router-dom";
-// import { useContext } from "react";
-// import { SearchContext } from "../context/SearchContext";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
-function Navbar() {
-  // const { searchQuery, setSearchQuery } = useContext(SearchContext);
+function Navbar({ searchQuery, setSearchQuery }) {
+  const navigate = useNavigate();
   const navLinkClass = ({ isActive }) =>
     isActive ? "nav-link nav-link-active" : "nav-link";
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    navigate("/games");
+  };
 
   return (
     <header className="navbar-shell">
@@ -13,20 +16,25 @@ function Navbar() {
         <div className="navbar-left">
           <Link to="/" className="logo">
             <span className="logo-mark" aria-hidden="true" />
-            <span className="logo-text">GameVault</span>
+            <span className="logo-text" onClick={() => navigate("/")}>GameVault</span>
           </Link>
         </div>
 
         <div className="navbar-center">
-          <label className="search-field" aria-label="Search games">
-            {/* <input
-              type="text"
-              placeholder="Search games..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-            /> */}
-          </label>
+          <form onSubmit={handleSearchSubmit}>
+            <label className="search-field" aria-label="Search games">
+              <span className="search-icon" aria-hidden="true">
+                Find
+              </span>
+              <input
+                type="text"
+                placeholder="Search games..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+            </label>
+          </form>
         </div>
 
         <div className="navbar-right">
