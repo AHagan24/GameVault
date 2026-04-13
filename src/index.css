@@ -275,3 +275,42 @@ a {
   margin-top: 0;
   margin-bottom: 10px;
 }
+
+.favorite-button {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #8b5cf6;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.favorite-button:hover {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
+.details-favorite-button {
+  margin: 16px 0 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #8b5cf6;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.details-favorite-button:hover {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
+.details-favorite-button.active {
+  background: #ef4444;
+}

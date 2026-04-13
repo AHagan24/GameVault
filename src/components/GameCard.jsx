@@ -1,7 +1,24 @@
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { FavoritesContext } from "../context/FavoritesContext";
 
 function GameCard({ game }) {
+  const { addFavorite, removeFavorite, isFavorite } =
+    useContext(FavoritesContext);
+
   if (!game) return null;
+
+  const favorite = isFavorite(game.id);
+
+  function handleFavoriteClick(e) {
+    e.preventDefault();
+
+    if (favorite) {
+      removeFavorite(game.id);
+    } else {
+      addFavorite(game);
+    }
+  }
 
   return (
     <Link to={`/games/${game.id}`} className="game-card-link">
@@ -31,6 +48,10 @@ function GameCard({ game }) {
           <h3>{game.name}</h3>
           <p>Rating: {game.rating}</p>
           <p>Released: {game.released}</p>
+
+          <button onClick={handleFavoriteClick} className="favorite-button">
+            {favorite ? "Remove Favorite" : "Add to Favorites"}
+          </button>
         </div>
       </div>
     </Link>
