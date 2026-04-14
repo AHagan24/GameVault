@@ -2,12 +2,29 @@ import { createContext, useEffect, useState } from "react";
 
 export const FavoritesContext = createContext();
 
+function normalizeFavorite(movie) {
+  if (!movie?.imdbID) {
+    return null;
+  }
+
+  return {
+    imdbID: movie.imdbID,
+    Title: movie.Title || "Untitled movie",
+    Year: movie.Year || "Unknown year",
+    Poster: movie.Poster && movie.Poster !== "N/A" ? movie.Poster : "",
+    Type: movie.Type || "movie",
+  };
+}
+
 export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState(() => {
     try {
       const storedFavorites = localStorage.getItem("favorites");
       const parsedFavorites = storedFavorites ? JSON.parse(storedFavorites) : [];
-      return Array.isArray(parsedFavorites) ? parsedFavorites : [];
+
+      return Array.isArray(parsedFavorites)
+        ? parsedFavorites.map(normalizeFavorite).filter(Boolean)
+        : [];
     } catch (error) {
       console.error("Failed to read favorites from localStorage.", error);
       return [];
@@ -22,24 +39,34 @@ export function FavoritesProvider({ children }) {
     }
   }, [favorites]);
 
-  function addFavorite(game) {
-    if (!game?.id) {
+  function addFavorite(movie) {
+    const normalizedMovie = normalizeFavorite(movie);
+
+    if (!normalizedMovie) {
       return;
     }
 
-    setFavorites((prev) => {
-      const alreadyExists = prev.some((item) => item.id === game.id);
-      if (alreadyExists) return prev;
-      return [...prev, game];
+    setFavorites((previousFavorites) => {
+      const alreadyExists = previousFavorites.some(
+        (favorite) => favorite.imdbID === normalizedMovie.imdbID,
+      );
+
+      if (alreadyExists) {
+        return previousFavorites;
+      }
+
+      return [...previousFavorites, normalizedMovie];
     });
   }
 
-  function removeFavorite(gameId) {
-    setFavorites((prev) => prev.filter((item) => item.id !== gameId));
+  function removeFavorite(imdbID) {
+    setFavorites((previousFavorites) =>
+      previousFavorites.filter((favorite) => favorite.imdbID !== imdbID),
+    );
   }
 
-  function isFavorite(gameId) {
-    return favorites.some((item) => item.id === gameId);
+  function isFavorite(imdbID) {
+    return favorites.some((favorite) => favorite.imdbID === imdbID);
   }
 
   return (

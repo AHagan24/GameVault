@@ -7,7 +7,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    navigate("/games");
+    navigate("/movies");
   };
 
   return (
@@ -16,23 +16,23 @@ function Navbar({ searchQuery, setSearchQuery }) {
         <div className="navbar-left">
           <Link to="/" className="logo">
             <span className="logo-mark" aria-hidden="true" />
-            <span className="logo-text">GameVault</span>
+            <span className="logo-text">MovieVault</span>
           </Link>
         </div>
 
         <div className="navbar-center">
           <form onSubmit={handleSearchSubmit} role="search">
-            <label className="search-field" aria-label="Search games">
+            <label className="search-field" aria-label="Search movies">
               <span className="search-icon" aria-hidden="true">
                 Find
               </span>
               <input
                 type="text"
-                placeholder="Search games..."
+                placeholder="Search movies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
-                aria-label="Search games"
+                aria-label="Search movies"
               />
             </label>
           </form>
@@ -42,8 +42,8 @@ function Navbar({ searchQuery, setSearchQuery }) {
           <NavLink to="/" className={navLinkClass} end>
             Home
           </NavLink>
-          <NavLink to="/games" className={navLinkClass}>
-            Games
+          <NavLink to="/movies" className={navLinkClass}>
+            Movies
           </NavLink>
           <NavLink to="/favorites" className={navLinkClass}>
             Favorites

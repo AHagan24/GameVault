@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { FavoritesContext } from "../context/FavoritesContext";
 import GameCard from "../components/GameCard";
+import { FavoritesContext } from "../context/FavoritesContext";
 
 function Favorites() {
   const { favorites } = useContext(FavoritesContext);
@@ -11,13 +11,13 @@ function Favorites() {
 
       {favorites.length === 0 ? (
         <p className="favorites-empty-state">
-          You have no favorite games yet. Save a few titles to build your
+          You have no favorite movies yet. Save a few titles to build your
           shortlist.
         </p>
       ) : (
         <div className="games-grid">
-          {favorites.map((game) => (
-            <GameCard key={game.id} game={game} />
+          {favorites.map((movie) => (
+            <GameCard key={movie.imdbID} game={movie} />
           ))}
         </div>
       )}

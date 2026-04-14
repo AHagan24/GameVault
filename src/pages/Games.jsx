@@ -1,28 +1,33 @@
-import { useEffect, useMemo, useState } from "react";
-import GameCard from "../components/GameCard";
+import { useEffect, useState } from "react";
+import MovieCard from "../components/GameCard";
 import SkeletonCard from "../components/SkeletonCard";
-import { fetchGames } from "../services/api";
+import { searchMovies } from "../services/api";
+
+const DEFAULT_QUERY = "Batman";
 
 function Games({ debouncedSearchQuery }) {
-  const [games, setGames] = useState([]);
+  const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("All Genres");
 
   useEffect(() => {
     const controller = new AbortController();
+    const activeQuery = debouncedSearchQuery || DEFAULT_QUERY;
 
-    async function loadGames() {
+    async function loadMovies() {
+      setLoading(true);
+      setError("");
+
       try {
-        const fetchedGames = await fetchGames(controller.signal);
-        setGames(fetchedGames);
-      } catch (err) {
-        if (err.name === "AbortError") {
+        const results = await searchMovies(activeQuery, 1, controller.signal);
+        setMovies(results);
+      } catch (error) {
+        if (error.name === "AbortError") {
           return;
         }
 
-        console.error(err);
-        setError("Failed to load games.");
+        console.error(error);
+        setError("Failed to load movies.");
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
@@ -30,48 +35,21 @@ function Games({ debouncedSearchQuery }) {
       }
     }
 
-    loadGames();
+    loadMovies();
 
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [debouncedSearchQuery]);
 
-  const normalizedQuery = debouncedSearchQuery.trim().toLowerCase();
-  const genreOptions = useMemo(() => {
-    const uniqueGenres = new Set();
-
-    games.forEach((game) => {
-      game.genres?.forEach((genre) => {
-        if (genre?.name) {
-          uniqueGenres.add(genre.name);
-        }
-      });
-    });
-
-    return [
-      "All Genres",
-      ...Array.from(uniqueGenres).sort((a, b) => a.localeCompare(b)),
-    ];
-  }, [games]);
-
-  const filteredGames = games.filter((game) => {
-    const matchesSearch = (game.name || "")
-      .toLowerCase()
-      .includes(normalizedQuery);
-    const matchesGenre =
-      selectedGenre === "All Genres" ||
-      game.genres?.some((genre) => genre?.name === selectedGenre);
-
-    return matchesSearch && matchesGenre;
-  });
+  const activeQuery = debouncedSearchQuery || DEFAULT_QUERY;
 
   if (loading) {
     return (
       <section className="games-page">
         <div className="games-filters">
           <div>
-            <p className="games-filters-label">Filter by genre</p>
+            <p className="games-filters-label">Searching OMDb</p>
             <div className="games-genre-select skeleton-block skeleton-select" />
           </div>
 
@@ -95,35 +73,21 @@ function Games({ debouncedSearchQuery }) {
     <section className="games-page">
       <div className="games-filters">
         <div>
-          <p className="games-filters-label">Filter by genre</p>
-          <select
-            className="games-genre-select"
-            value={selectedGenre}
-            onChange={(e) => setSelectedGenre(e.target.value)}
-          >
-            {genreOptions.map((genre) => (
-              <option key={genre} value={genre}>
-                {genre}
-              </option>
-            ))}
-          </select>
+          <p className="games-filters-label">Search term</p>
+          <div className="games-query-chip">{activeQuery}</div>
         </div>
 
         <p className="games-results-summary">
-          Showing {filteredGames.length} of {games.length} games
+          Showing {movies.length} movie{movies.length === 1 ? "" : "s"}
         </p>
       </div>
 
-      {filteredGames.length === 0 ? (
-        <div className="games-empty-state">
-          {games.length === 0
-            ? "No games are available right now."
-            : "No games match your search and genre filters."}
-        </div>
+      {movies.length === 0 ? (
+        <div className="games-empty-state">No movies matched "{activeQuery}".</div>
       ) : (
         <div className="games-grid">
-          {filteredGames.map((game) => (
-            <GameCard key={game.id} game={game} />
+          {movies.map((movie) => (
+            <MovieCard key={movie.imdbID} movie={movie} />
           ))}
         </div>
       )}

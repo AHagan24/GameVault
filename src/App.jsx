@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Games from "./pages/Games";
-import GameDetails from "./pages/GameDetails";
-import Favorites from "./pages/Favorites";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Favorites from "./pages/Favorites";
+import MovieDetails from "./pages/GameDetails";
+import Movies from "./pages/Games";
+import Home from "./pages/Home";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,7 +12,7 @@ function App() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
+      setDebouncedSearchQuery(searchQuery.trim());
     }, 350);
 
     return () => {
@@ -28,10 +28,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
-            path="/games"
-            element={<Games debouncedSearchQuery={debouncedSearchQuery} />}
+            path="/movies"
+            element={<Movies debouncedSearchQuery={debouncedSearchQuery} />}
           />
-          <Route path="/games/:id" element={<GameDetails />} />
+          <Route path="/movies/:imdbID" element={<MovieDetails />} />
           <Route path="/favorites" element={<Favorites />} />
         </Routes>
       </main>

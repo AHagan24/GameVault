@@ -1,42 +1,44 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
-import GameCard from "../components/GameCard";
+import MovieCard from "../components/GameCard";
 import SkeletonCard from "../components/SkeletonCard";
 import SkeletonHero from "../components/SkeletonHero";
-import { fetchFeaturedGames, fetchGames } from "../services/api";
+import { fetchFeaturedMovies, fetchPopularMovies } from "../services/api";
 
 function Home() {
-  const [featuredGames, setFeaturedGames] = useState([]);
-  const [popularGames, setPopularGames] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [popularLoading, setPopularLoading] = useState(true);
+  const [featuredMovies, setFeaturedMovies] = useState([]);
+  const [popularMovies, setPopularMovies] = useState([]);
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [featuredError, setFeaturedError] = useState("");
+  const [loadingPopular, setLoadingPopular] = useState(true);
   const [popularError, setPopularError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function loadFeaturedGames() {
+    async function loadFeaturedMovies() {
+      setFeaturedError("");
+
       try {
-        const games = await fetchFeaturedGames(controller.signal);
-        setFeaturedGames(games);
-      } catch (err) {
-        if (err.name === "AbortError") {
+        const movies = await fetchFeaturedMovies(controller.signal);
+        setFeaturedMovies(movies);
+      } catch (error) {
+        if (error.name === "AbortError") {
           return;
         }
 
-        console.error(err);
-        setError("Failed to load featured games.");
+        console.error(error);
+        setFeaturedError("Failed to load featured movies.");
       } finally {
         if (!controller.signal.aborted) {
-          setLoading(false);
+          setLoadingFeatured(false);
         }
       }
     }
 
-    loadFeaturedGames();
+    loadFeaturedMovies();
 
     return () => {
       controller.abort();
@@ -46,25 +48,27 @@ function Home() {
   useEffect(() => {
     const controller = new AbortController();
 
-    async function loadPopularGames() {
+    async function loadPopularMovies() {
+      setPopularError("");
+
       try {
-        const games = await fetchGames(controller.signal);
-        setPopularGames(games.slice(0, 3));
-      } catch (err) {
-        if (err.name === "AbortError") {
+        const movies = await fetchPopularMovies(controller.signal);
+        setPopularMovies(movies);
+      } catch (error) {
+        if (error.name === "AbortError") {
           return;
         }
 
-        console.error(err);
-        setPopularError("Failed to load popular games.");
+        console.error(error);
+        setPopularError("Failed to load popular movies.");
       } finally {
         if (!controller.signal.aborted) {
-          setPopularLoading(false);
+          setLoadingPopular(false);
         }
       }
     }
 
-    loadPopularGames();
+    loadPopularMovies();
 
     return () => {
       controller.abort();
@@ -72,20 +76,22 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    if (featuredGames.length <= 1) {
+    if (featuredMovies.length <= 1) {
       return undefined;
     }
 
     const intervalId = window.setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % featuredGames.length);
+      setCurrentFeaturedIndex(
+        (previousIndex) => (previousIndex + 1) % featuredMovies.length,
+      );
     }, 4500);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [featuredGames]);
+  }, [featuredMovies]);
 
-  if (loading) {
+  if (loadingFeatured) {
     return (
       <>
         <SkeletonHero />
@@ -96,12 +102,12 @@ function Home() {
               <p className="home-section-eyebrow">Browse</p>
               <h2>Popular Right Now</h2>
               <p className="home-section-copy">
-                A quick look at standout titles worth jumping into next.
+                A quick look at standout movies worth adding to your watchlist.
               </p>
             </div>
 
-            <Link to="/games" className="home-section-link">
-              Browse All Games
+            <Link to="/movies" className="home-section-link">
+              Browse All Movies
             </Link>
           </div>
 
@@ -115,45 +121,46 @@ function Home() {
     );
   }
 
-  if (error) {
-    return <section className="hero-status">{error}</section>;
+  if (featuredError) {
+    return <section className="hero-status">{featuredError}</section>;
   }
 
-  if (featuredGames.length === 0) {
+  if (featuredMovies.length === 0) {
     return (
-      <section className="hero-status">No featured games available.</section>
+      <section className="hero-status">No featured movies available.</section>
     );
   }
 
-  const featuredGame = featuredGames[currentIndex] || featuredGames[0];
-  const supportingText =
-    Array.isArray(featuredGame.genres) && featuredGame.genres.length > 0
-      ? `Explore ${featuredGame.genres
-          .slice(0, 2)
-          .map((genre) => genre.name)
-          .join(" and ")} in one of GameVault's standout picks.`
-      : "Jump into one of the most talked-about games in the collection.";
+  const featuredMovie =
+    featuredMovies[currentFeaturedIndex] || featuredMovies[0];
+  const featuredRating =
+    featuredMovie.imdbRating && featuredMovie.imdbRating !== "N/A"
+      ? featuredMovie.imdbRating
+      : "No rating";
+  const heroCopy = `Revisit a standout ${featuredMovie.Type || "movie"} from ${
+    featuredMovie.Year || "the catalog"
+  } and jump into the full details for cast, director, plot, and rating.`;
 
   return (
     <>
       <section
         className="hero-section"
         style={{
-          backgroundImage: featuredGame.background_image
-            ? `linear-gradient(135deg, rgba(8, 10, 18, 0.72), rgba(8, 10, 18, 0.9)), url(${featuredGame.background_image})`
+          backgroundImage: featuredMovie.Poster
+            ? `linear-gradient(135deg, rgba(8, 10, 18, 0.72), rgba(8, 10, 18, 0.9)), url(${featuredMovie.Poster})`
             : "linear-gradient(135deg, rgba(31, 41, 55, 0.92), rgba(17, 24, 39, 0.98))",
         }}
       >
         <div className="hero-overlay" />
         <div className="hero-content">
-          <p className="hero-eyebrow">Featured Game</p>
-          <h1>{featuredGame.name}</h1>
-          <p className="hero-copy">{supportingText}</p>
+          <p className="hero-eyebrow">Featured Movie</p>
+          <h1>{featuredMovie.Title}</h1>
+          <p className="hero-copy">{heroCopy}</p>
           <div className="hero-meta">
-            <span>⭐ {featuredGame.rating?.toFixed(1)}</span>
-            <span>Released: {featuredGame.released || "TBA"}</span>
+            <span>Year: {featuredMovie.Year || "Unknown"}</span>
+            <span>{`\u2B50 ${featuredRating}`}</span>
           </div>
-          <Link to={`/games/${featuredGame.id}`} className="hero-button">
+          <Link to={`/movies/${featuredMovie.imdbID}`} className="hero-button">
             View Details
           </Link>
         </div>
@@ -165,16 +172,16 @@ function Home() {
             <p className="home-section-eyebrow">Browse</p>
             <h2>Popular Right Now</h2>
             <p className="home-section-copy">
-              A quick look at standout titles worth jumping into next.
+              A quick look at standout movies worth adding to your watchlist.
             </p>
           </div>
 
-          <Link to="/games" className="home-section-link">
-            Browse All Games
+          <Link to="/movies" className="home-section-link">
+            Browse All Movies
           </Link>
         </div>
 
-        {popularLoading ? (
+        {loadingPopular ? (
           <div className="games-grid games-grid-compact">
             {Array.from({ length: 3 }).map((_, index) => (
               <SkeletonCard key={index} />
@@ -182,14 +189,14 @@ function Home() {
           </div>
         ) : popularError ? (
           <div className="games-empty-state">{popularError}</div>
-        ) : popularGames.length === 0 ? (
+        ) : popularMovies.length === 0 ? (
           <div className="games-empty-state">
-            No popular games are available right now.
+            No popular movies are available right now.
           </div>
         ) : (
           <div className="games-grid games-grid-compact">
-            {popularGames.map((game) => (
-              <GameCard key={game.id} game={game} />
+            {popularMovies.map((movie) => (
+              <MovieCard key={movie.imdbID} movie={movie} variant="popular" />
             ))}
           </div>
         )}
@@ -198,33 +205,33 @@ function Home() {
       <section className="home-section">
         <div className="home-section-header home-section-header-centered">
           <div>
-            <p className="home-section-eyebrow">Why GameVault</p>
-            <h2>Everything you need for your next session</h2>
+            <p className="home-section-eyebrow">Why MovieVault</p>
+            <h2>Everything you need for movie night</h2>
           </div>
         </div>
 
         <div className="feature-grid">
           <article className="feature-card">
-            <span className="feature-card-kicker">Discover New Games</span>
+            <span className="feature-card-kicker">Discover Movies</span>
             <p>
-              Browse fresh picks, revisit classics, and move from curiosity to
-              your next playthrough fast.
+              Search across the OMDb catalog, revisit classics, and find
+              something worth watching in a few clicks.
             </p>
           </article>
 
           <article className="feature-card">
             <span className="feature-card-kicker">Save Favorites</span>
             <p>
-              Keep your shortlist close so the games you want to track are
+              Keep your shortlist close so the movies you want to revisit are
               always easy to find.
             </p>
           </article>
 
           <article className="feature-card">
-            <span className="feature-card-kicker">Watch Trailers</span>
+            <span className="feature-card-kicker">See Full Details</span>
             <p>
-              Preview the look and feel of a game before you dive deeper into
-              the full details page.
+              Open a movie page for the plot, cast, runtime, genre, director,
+              and IMDb rating in one place.
             </p>
           </article>
         </div>
@@ -233,12 +240,13 @@ function Home() {
       <section className="home-cta-section">
         <div className="home-cta-card">
           <p className="home-section-eyebrow">Start Exploring</p>
-          <h2>Ready to explore your next favorite game?</h2>
+          <h2>Ready to explore your next favorite movie?</h2>
           <p>
-            Dive into the full library and find something worth playing tonight.
+            Dive into the full catalog and find something worth watching
+            tonight.
           </p>
-          <Link to="/games" className="hero-button">
-            Explore Games
+          <Link to="/movies" className="hero-button">
+            Explore Movies
           </Link>
         </div>
       </section>
