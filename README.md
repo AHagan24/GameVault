@@ -1,75 +1,102 @@
-# 🎮 GameVault
+# 🎬 MovieVault
 
-GameVault is a modern React-based game discovery web application that allows users to explore, search, and save video games using real-time data from the RAWG API.
+A modern movie discovery app built with React and powered by the OMDb API.
+Browse movies, search in real time, filter results, and save your favorites — all in a clean, responsive UI.
 
 ---
 
 ## 🚀 Features
 
-- 🔍 **Search Games**  
-  Search for games using a responsive navbar search with debounced input.
-
-- 🎯 **Genre Filtering**  
-  Filter games by genre for a more refined browsing experience.
-
-- 📄 **Dynamic Game Pages**  
-  Click any game to view detailed information including:
-  - Rating
-  - Release date
-  - Genres
-  - Platforms
-  - Trailers
-
-- ❤️ **Favorites System**  
-  Save and remove games from your favorites using localStorage.
-
-- 🎬 **Trailers Integration**  
-  Watch game trailers directly on the details page (when available).
-
-- 🖼️ **Rotating Hero Section**  
-  Homepage features a rotating display of popular/featured games.
-
-- 📱 **Responsive Design**  
-  Fully optimized for mobile, tablet, and desktop devices.
-
-- ⚡ **Loading Skeletons**  
-  Smooth loading states for a polished user experience.
+* 🔍 **Search Movies** – Real-time search powered by OMDb API
+* 🎯 **Filters** – Filter by type (movie/series) and year
+* ⭐ **IMDb Ratings** – View ratings directly on movie cards
+* ❤️ **Favorites System** – Save and manage your favorite movies
+* 🎬 **Dynamic Movie Pages** – Detailed movie info with plot, cast, and more
+* 🏠 **Featured Hero Section** – Rotating featured movies on the homepage
+* 📱 **Responsive Design** – Works across desktop and mobile devices
+* ⚡ **Debounced Search** – Optimized API calls for performance
+* 🎨 **Modern UI/UX** – Clean, minimal, and product-style interface
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **React (Vite)**
-- **React Router**
-- **JavaScript (ES6+)**
-- **CSS (Custom, responsive design)**
-- **RAWG Video Games Database API**
-
-
----
-
-## 🔗 API Used
-
-- [RAWG Video Games Database API](https://rawg.io/apidocs)
-
----
-
-## 🧠 What I Learned
-
-- Building dynamic routes with React Router
-- Managing global state with Context API
-- Working with external APIs and asynchronous data
-- Creating responsive layouts for all screen sizes
-- Implementing debounced search for performance
-- Designing reusable components
-- Structuring a real-world React application
+* **Frontend:** React + Vite
+* **Styling:** CSS (custom modern UI)
+* **API:** OMDb API
+* **State Management:** React Hooks + Context API
+* **Routing:** React Router
 
 ---
 
 ## 📦 Installation
 
+1. Clone the repository:
+
 ```bash
-git clone https://github.com/your-username/gamevault.git
-cd gamevault
+git clone https://github.com/YOUR_USERNAME/movie-vault.git
+cd movie-vault
+```
+
+2. Install dependencies:
+
+```bash
 npm install
+```
+
+3. Create a `.env` file in the root directory:
+
+```bash
+VITE_OMDB_API_KEY=your_api_key_here
+```
+
+4. Start the development server:
+
+```bash
 npm run dev
+```
+
+---
+
+## ⚠️ Notes
+
+* OMDb API has a **1000 request/day limit** on the free tier
+* Some movies may not have posters or ratings available
+* API key must be activated via email before use
+
+---
+
+## 🎯 What I Learned
+
+* Working with real-world APIs and handling edge cases
+* Managing async data and error states in React
+* Optimizing performance with debouncing and request control
+* Building scalable UI components and reusable logic
+* Debugging API limits and production-like issues
+
+---
+
+## 📌 Future Improvements
+
+* Pagination for large result sets
+* Better caching to reduce API calls
+* Advanced filtering (genre, ratings, etc.)
+* User authentication for persistent favorites
+
+---
+
+## 📸 Demo
+
+*Add screenshots or a demo link here if needed*
+
+---
+
+## 👤 Author
+
+**Addison Hagan**
+
+---
+
+## 📄 License
+
+This project is for educational purposes.
