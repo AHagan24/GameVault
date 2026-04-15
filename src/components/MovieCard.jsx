@@ -27,18 +27,21 @@ function MovieCard({ movie, variant = "default" }) {
   const title = movie.Title || "Untitled movie";
   const year = movie.Year || "Unknown year";
   const poster = movie.Poster || "";
-  const imdbRating =
-    movie.imdbRating && movie.imdbRating !== "N/A"
-      ? movie.imdbRating
-      : "No rating available";
+  const hasRating = Boolean(movie.imdbRating) && movie.imdbRating !== "N/A";
+  const imdbRating = hasRating ? movie.imdbRating : "";
   const plot = truncateText(
     movie.Plot && movie.Plot !== "N/A" ? movie.Plot : "No plot available",
   );
   const hasPoster = Boolean(poster) && poster !== "N/A" && !imageError;
   const isPopularVariant = variant === "popular";
 
+  if (!hasPoster) {
+    return null;
+  }
+
   function handleFavoriteClick(e) {
     e.preventDefault();
+    e.stopPropagation();
 
     if (favorite) {
       removeFavorite(movie.imdbID);
@@ -52,43 +55,38 @@ function MovieCard({ movie, variant = "default" }) {
     <Link to={`/movies/${movie.imdbID}`} className="game-card-link">
       <div className="game-card">
         <div className="game-card-poster">
-          {hasPoster ? (
-            <img
-              src={poster}
-              alt={title}
-              className="game-card-image"
-              loading="lazy"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="game-card-image game-card-image-fallback">
-              Poster unavailable
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={handleFavoriteClick}
+            className={`favorite-icon-button${favorite ? " active" : ""}`}
+            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            aria-pressed={favorite}
+          >
+            <span aria-hidden="true">{favorite ? "\u2665" : "\u2661"}</span>
+          </button>
+          <img
+            src={poster}
+            alt={title}
+            className="game-card-image"
+            loading="lazy"
+            onError={() => setImageError(true)}
+          />
         </div>
 
         <div className="game-card-content">
           <h3>{title}</h3>
           {isPopularVariant ? (
             <>
-              <p>{`\u2B50 ${imdbRating}`}</p>
+              {hasRating ? <p>{`\u2B50 ${imdbRating}`}</p> : null}
               <p>Year: {year}</p>
               <p>{plot}</p>
             </>
           ) : (
             <>
+              {hasRating ? <p>{`\u2B50 ${imdbRating}`}</p> : null}
               <p>Year: {year}</p>
-              <p>Type: {movie.Type || "movie"}</p>
             </>
           )}
-
-          <button
-            type="button"
-            onClick={handleFavoriteClick}
-            className="favorite-button"
-          >
-            {favorite ? "Remove Favorite" : "Add to Favorites"}
-          </button>
         </div>
       </div>
     </Link>

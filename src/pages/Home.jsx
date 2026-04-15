@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
-import MovieCard from "../components/GameCard";
+import MovieCard from "../components/MovieCard";
 import SkeletonCard from "../components/SkeletonCard";
 import SkeletonHero from "../components/SkeletonHero";
 import { fetchFeaturedMovies, fetchPopularMovies } from "../services/api";

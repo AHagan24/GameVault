@@ -3,12 +3,14 @@ import { createContext, useEffect, useState } from "react";
 export const FavoritesContext = createContext();
 
 function normalizeFavorite(movie) {
-  if (!movie?.imdbID) {
+  const imdbID = movie?.imdbID || movie?.id;
+
+  if (!imdbID) {
     return null;
   }
 
   return {
-    imdbID: movie.imdbID,
+    imdbID,
     Title: movie.Title || "Untitled movie",
     Year: movie.Year || "Unknown year",
     Poster: movie.Poster && movie.Poster !== "N/A" ? movie.Poster : "",

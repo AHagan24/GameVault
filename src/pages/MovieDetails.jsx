@@ -4,7 +4,7 @@ import SkeletonDetails from "../components/SkeletonDetails";
 import { FavoritesContext } from "../context/FavoritesContext";
 import { fetchMovieDetails } from "../services/api";
 
-function GameDetails() {
+function MovieDetails() {
   const { imdbID } = useParams();
   const { addFavorite, removeFavorite, isFavorite } =
     useContext(FavoritesContext);
@@ -73,7 +73,18 @@ function GameDetails() {
 
   return (
     <div className="game-details-page">
-      <h1>{movie.Title}</h1>
+      <div className="game-details-header">
+        <h1>{movie.Title}</h1>
+        <button
+          type="button"
+          onClick={handleFavoriteClick}
+          className={`favorite-icon-button details-favorite-icon${favorite ? " active" : ""}`}
+          aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+          aria-pressed={favorite}
+        >
+          <span aria-hidden="true">{favorite ? "\u2665" : "\u2661"}</span>
+        </button>
+      </div>
 
       {movie.Poster && (
         <img
@@ -82,14 +93,6 @@ function GameDetails() {
           className="game-details-hero"
         />
       )}
-
-      <button
-        type="button"
-        onClick={handleFavoriteClick}
-        className={`details-favorite-button${favorite ? " active" : ""}`}
-      >
-        {favorite ? "Remove Favorite" : "Add to Favorites"}
-      </button>
 
       <div className="movie-details-meta">
         <p>
@@ -120,4 +123,4 @@ function GameDetails() {
   );
 }
 
-export default GameDetails;
+export default MovieDetails;

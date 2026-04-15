@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Favorites from "./pages/Favorites";
-import MovieDetails from "./pages/GameDetails";
-import Movies from "./pages/Games";
+import MovieDetails from "./pages/MovieDetails";
+import Movies from "./pages/Movies";
 import Home from "./pages/Home";
 
 function App() {

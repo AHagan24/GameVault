@@ -2,6 +2,17 @@ const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 const BASE_URL = "https://www.omdbapi.com/";
 
 const DEFAULT_BROWSE_QUERY = "Batman";
+const DEFAULT_BROWSE_TERMS = [
+  "Batman",
+  "Inception",
+  "Interstellar",
+  "Harry Potter",
+  "Spider-Man",
+  "Jurassic Park",
+  "Star Wars",
+];
+const DEFAULT_BROWSE_LIMIT = 12;
+const DEFAULT_BROWSE_RESULTS_PER_TERM = 2;
 const HOME_FEATURED_TERMS = [
   "Batman",
   "Harry Potter",
@@ -71,8 +82,23 @@ function hasValidPoster(movie) {
   return Boolean(movie?.Poster) && movie.Poster !== "N/A";
 }
 
+function isAbortError(error) {
+  return error?.name === "AbortError";
+}
+
+function isOmdbFailure(data) {
+  return !data || data.Response === "False";
+}
+
 async function fetchFromOmdb(params, signal) {
-  const response = await fetch(createUrl(params), { signal });
+  let response;
+
+  try {
+    response = await fetch(createUrl(params), { signal });
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    throw new Error("Network error");
+  }
 
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`);
@@ -81,17 +107,52 @@ async function fetchFromOmdb(params, signal) {
   return response.json();
 }
 
+async function searchMoviesSafely(query, page, type, year, signal) {
+  try {
+    return await searchMovies(query, page, type, year, signal);
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
+
+    return [];
+  }
+}
+
+async function fetchMovieDetailsSafely(imdbID, signal) {
+  if (!imdbID) {
+    return null;
+  }
+
+  try {
+    return await fetchMovieDetails(imdbID, signal);
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
+
+    return null;
+  }
+}
+
 async function hydrateMoviesWithDetails(movies, signal) {
-  return Promise.all(
-    movies.map(async (movie) => {
+  const validMovies = movies.filter((movie) => movie?.imdbID);
+
+  const hydratedMovies = await Promise.all(
+    validMovies.map(async (movie) => {
       try {
-        const details = await fetchMovieDetails(movie.imdbID, signal);
+        const details = await fetchMovieDetailsSafely(movie.imdbID, signal);
+
+        if (!details) {
+          return movie;
+        }
+
         return {
           ...movie,
           ...details,
         };
       } catch (error) {
-        if (error.name === "AbortError") {
+        if (isAbortError(error)) {
           throw error;
         }
 
@@ -99,33 +160,132 @@ async function hydrateMoviesWithDetails(movies, signal) {
       }
     }),
   );
+
+  return hydratedMovies.filter(Boolean);
 }
 
-export async function searchMovies(query, page = 1, signal) {
+export async function searchMoviesWithDetails(
+  query,
+  page = 1,
+  type = "All",
+  year = "",
+  signal,
+) {
+  const movies = await searchMovies(query, page, type, year, signal);
+  return hydrateMoviesWithDetails(movies, signal);
+}
+
+export async function searchMovies(
+  query,
+  page = 1,
+  type = "All",
+  year = "",
+  signal,
+) {
   const normalizedQuery = query?.trim() || DEFAULT_BROWSE_QUERY;
+  const normalizedType = type && type !== "All" ? type : undefined;
+  const normalizedYear = year?.trim() || undefined;
   const data = await fetchFromOmdb(
     {
       s: normalizedQuery,
-      type: "movie",
+      ...(normalizedType ? { type: normalizedType } : {}),
+      ...(normalizedYear ? { y: normalizedYear } : {}),
       page: String(page),
     },
     signal,
   );
 
-  if (data.Response === "False") {
-    if (data.Error === "Movie not found!") {
-      return [];
-    }
-
-    throw new Error(data.Error || "OMDb search failed");
+  if (isOmdbFailure(data)) {
+    return [];
   }
 
   return Array.isArray(data.Search)
-    ? data.Search.map(normalizeMovie).filter(Boolean)
+    ? data.Search.map(normalizeMovie).filter(Boolean).filter(hasValidPoster)
     : [];
 }
 
+export async function fetchDefaultMovies(
+  { type = "All", year = "" } = {},
+  signal,
+) {
+  const settledGroups = await Promise.allSettled(
+    DEFAULT_BROWSE_TERMS.map(async (term) => {
+      const movies = await searchMovies(term, 1, type, year, signal);
+
+      return movies.map((movie) => ({
+        ...movie,
+        sourceTerm: term,
+      }));
+    }),
+  );
+  const groups = settledGroups
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => result.value);
+
+  if (groups.length === 0) {
+    const firstFailure = settledGroups.find(
+      (result) => result.status === "rejected",
+    );
+    throw firstFailure?.reason || new Error("Network error");
+  }
+
+  const uniqueMovies = [];
+  const seenIds = new Set();
+
+  for (const movies of groups) {
+    let pickedForTerm = 0;
+
+    for (const movie of movies) {
+      if (seenIds.has(movie.imdbID)) {
+        continue;
+      }
+
+      uniqueMovies.push(movie);
+      seenIds.add(movie.imdbID);
+      pickedForTerm += 1;
+
+      if (
+        pickedForTerm === DEFAULT_BROWSE_RESULTS_PER_TERM ||
+        uniqueMovies.length === DEFAULT_BROWSE_LIMIT
+      ) {
+        break;
+      }
+    }
+
+    if (uniqueMovies.length === DEFAULT_BROWSE_LIMIT) {
+      break;
+    }
+  }
+
+  for (const movies of groups) {
+    for (const movie of movies) {
+      if (seenIds.has(movie.imdbID)) {
+        continue;
+      }
+
+      uniqueMovies.push(movie);
+      seenIds.add(movie.imdbID);
+
+      if (uniqueMovies.length === DEFAULT_BROWSE_LIMIT) {
+        break;
+      }
+    }
+
+    if (uniqueMovies.length === DEFAULT_BROWSE_LIMIT) {
+      break;
+    }
+  }
+
+  return uniqueMovies
+    .map(({ sourceTerm, ...movie }) => movie)
+    .slice(0, DEFAULT_BROWSE_LIMIT);
+}
+
 export async function fetchMovieDetails(imdbID, signal) {
+  if (!imdbID) {
+    throw new Error("Movie not found!");
+  }
+
   const data = await fetchFromOmdb(
     {
       i: imdbID,
@@ -134,7 +294,7 @@ export async function fetchMovieDetails(imdbID, signal) {
     signal,
   );
 
-  if (data.Response === "False") {
+  if (isOmdbFailure(data)) {
     throw new Error(data.Error || "Movie details request failed");
   }
 
@@ -150,15 +310,20 @@ export async function fetchMovieDetails(imdbID, signal) {
 export async function fetchFeaturedMovies(signal) {
   const groups = await Promise.all(
     HOME_FEATURED_TERMS.map(async (term) => {
-      const movies = await searchMovies(term, 1, signal);
+      try {
+        const movies = await searchMoviesSafely(term, 1, "movie", "", signal);
 
-      return movies
-        .filter(hasValidPoster)
-        .slice(0, HOME_FEATURED_RESULTS_PER_TERM)
-        .map((movie) => ({
-          ...movie,
-          sourceTerm: term,
-        }));
+        return movies
+          .filter(hasValidPoster)
+          .slice(0, HOME_FEATURED_RESULTS_PER_TERM)
+          .map((movie) => ({
+            ...movie,
+            sourceTerm: term,
+          }));
+      } catch (error) {
+        if (isAbortError(error)) throw error;
+        return []; // ← THIS IS THE FIX
+      }
     }),
   );
 
@@ -208,16 +373,21 @@ export async function fetchFeaturedMovies(signal) {
 
 export async function fetchPopularMovies(signal) {
   const groups = await Promise.all(
-    HOME_POPULAR_TERMS.map(async (term) => {
-      const movies = await searchMovies(term, 1, signal);
+    HOME_FEATURED_TERMS.map(async (term) => {
+      try {
+        const movies = await searchMoviesSafely(term, 1, "movie", "", signal);
 
-      return movies
-        .filter(hasValidPoster)
-        .slice(0, HOME_POPULAR_RESULTS_PER_TERM)
-        .map((movie) => ({
-          ...movie,
-          sourceTerm: term,
-        }));
+        return movies
+          .filter(hasValidPoster)
+          .slice(0, HOME_FEATURED_RESULTS_PER_TERM)
+          .map((movie) => ({
+            ...movie,
+            sourceTerm: term,
+          }));
+      } catch (error) {
+        if (isAbortError(error)) throw error;
+        return []; // ← THIS IS THE FIX
+      }
     }),
   );
 

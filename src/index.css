@@ -798,6 +798,14 @@ video {
   box-shadow: var(--shadow-soft);
 }
 
+.games-toolbar {
+  display: flex;
+  flex: 1;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
 .games-filters-label {
   margin: 0 0 10px;
   color: var(--text-muted);
@@ -807,9 +815,38 @@ video {
   text-transform: uppercase;
 }
 
-.games-genre-select {
-  min-width: 220px;
-  padding: 12px 14px;
+.games-results-heading {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 700;
+}
+
+.games-filter-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.games-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.games-filter-name {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.games-filter-input {
+  min-width: 140px;
+  min-height: 44px;
+  padding: 11px 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   background: var(--bg-input);
@@ -821,22 +858,9 @@ video {
     box-shadow 180ms ease;
 }
 
-.games-genre-select:focus {
+.games-filter-input:focus {
   border-color: var(--border-strong);
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.14);
-}
-
-.games-query-chip {
-  display: inline-flex;
-  align-items: center;
-  min-width: 220px;
-  min-height: 47px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  background: var(--bg-input);
-  color: var(--text-primary);
-  font-size: 0.95rem;
 }
 
 .games-results-summary {
@@ -931,47 +955,62 @@ video {
   line-height: 1.5;
 }
 
-.favorite-button {
-  margin-top: auto;
-  width: 100%;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: #8b5cf6;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-
-.favorite-button:hover {
-  background: #7c3aed;
-  transform: translateY(-1px);
-}
-
-.details-favorite-button {
-  margin: 16px 0 8px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 10px;
-  background: #8b5cf6;
+.favorite-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(8, 10, 18, 0.72);
   color: #fff;
-  font-weight: 600;
+  font-size: 1.35rem;
+  line-height: 1;
   cursor: pointer;
   transition:
     background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
     transform 0.2s ease;
+  backdrop-filter: blur(6px);
 }
 
-.details-favorite-button:hover {
-  background: #7c3aed;
+.favorite-icon-button:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(18, 22, 32, 0.88);
   transform: translateY(-1px);
 }
 
-.details-favorite-button.active {
-  background: #ef4444;
+.favorite-icon-button.active {
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(60, 10, 22, 0.82);
+}
+
+.game-card-poster .favorite-icon-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.game-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.game-details-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.details-favorite-icon {
+  flex-shrink: 0;
 }
 
 .game-details-page {
@@ -984,13 +1023,7 @@ video {
   box-shadow: var(--shadow-soft);
 }
 
-.game-details-page > h1 {
-  margin: 0 0 18px;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.05;
-}
-
-.game-details-page > :not(.game-details-hero) {
+.game-details-page > :not(.game-details-hero):not(.game-details-header) {
   max-width: 860px;
 }
 
@@ -1234,12 +1267,20 @@ video {
     padding: 16px;
   }
 
-  .games-genre-select {
-    width: 100%;
-    min-width: 0;
+  .games-toolbar {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .games-query-chip {
+  .games-filter-controls {
+    justify-content: stretch;
+  }
+
+  .games-filter-field {
+    flex: 1 1 160px;
+  }
+
+  .games-filter-input {
     width: 100%;
     min-width: 0;
   }
@@ -1279,7 +1320,7 @@ video {
     border-radius: 20px;
   }
 
-  .game-details-page > h1 {
+  .game-details-header {
     margin-bottom: 16px;
   }
 
@@ -1288,10 +1329,9 @@ video {
     border-radius: 16px;
   }
 
-  .details-favorite-button {
-    width: 100%;
-    margin: 16px 0 12px;
-    padding: 12px 16px;
+  .details-favorite-icon {
+    width: 40px;
+    height: 40px;
   }
 
   .game-details-description {
@@ -1409,12 +1449,90 @@ video {
   font-size: clamp(2rem, 4vw, 2.8rem);
 }
 
+.favorites-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 20px 0;
+}
+
+.favorites-header {
+  padding: 28px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(16, 17, 22, 0.96), rgba(12, 13, 18, 0.94)),
+    radial-gradient(circle at top right, rgba(229, 9, 20, 0.12), transparent 30%);
+  box-shadow: var(--shadow-soft);
+}
+
+.favorites-label {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.favorites-subtitle {
+  margin: 12px 0 0;
+  max-width: 42ch;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.favorites-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 260px));
+  justify-content: center;
+  padding: 0;
+}
+
+.favorites-grid .game-card {
+  width: 100%;
+  transform-origin: center;
+}
+
+.favorites-grid .game-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
 .favorites-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
   margin: 0;
   padding: 56px 20px;
-  color: var(--text-muted);
   text-align: center;
   border: 1px solid var(--border-subtle);
   border-radius: 22px;
   background: rgba(18, 18, 22, 0.72);
+}
+
+.favorites-empty-state h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.favorites-empty-state p {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 720px) {
+  .favorites-page {
+    padding: 20px 0 0;
+  }
+
+  .favorites-header {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
 }
