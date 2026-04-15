@@ -35,10 +35,6 @@ function MovieCard({ movie, variant = "default" }) {
   const hasPoster = Boolean(poster) && poster !== "N/A" && !imageError;
   const isPopularVariant = variant === "popular";
 
-  if (!hasPoster) {
-    return null;
-  }
-
   function handleFavoriteClick(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -64,13 +60,19 @@ function MovieCard({ movie, variant = "default" }) {
           >
             <span aria-hidden="true">{favorite ? "\u2665" : "\u2661"}</span>
           </button>
-          <img
-            src={poster}
-            alt={title}
-            className="game-card-image"
-            loading="lazy"
-            onError={() => setImageError(true)}
-          />
+          {hasPoster ? (
+            <img
+              src={poster}
+              alt={title}
+              className="game-card-image"
+              loading="lazy"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="game-card-image-fallback" aria-label={`${title} poster unavailable`}>
+              <span>Poster unavailable</span>
+            </div>
+          )}
         </div>
 
         <div className="game-card-content">

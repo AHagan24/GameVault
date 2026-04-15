@@ -90,6 +90,10 @@ function isOmdbFailure(data) {
   return !data || data.Response === "False";
 }
 
+function isNoResultsError(data) {
+  return data?.Error === "Movie not found!";
+}
+
 async function fetchFromOmdb(params, signal) {
   let response;
 
@@ -196,7 +200,11 @@ export async function searchMovies(
   );
 
   if (isOmdbFailure(data)) {
-    return [];
+    if (isNoResultsError(data)) {
+      return [];
+    }
+
+    throw new Error(data?.Error || "Movie search request failed");
   }
 
   return Array.isArray(data.Search)
@@ -373,13 +381,13 @@ export async function fetchFeaturedMovies(signal) {
 
 export async function fetchPopularMovies(signal) {
   const groups = await Promise.all(
-    HOME_FEATURED_TERMS.map(async (term) => {
+    HOME_POPULAR_TERMS.map(async (term) => {
       try {
         const movies = await searchMoviesSafely(term, 1, "movie", "", signal);
 
         return movies
           .filter(hasValidPoster)
-          .slice(0, HOME_FEATURED_RESULTS_PER_TERM)
+          .slice(0, HOME_POPULAR_RESULTS_PER_TERM)
           .map((movie) => ({
             ...movie,
             sourceTerm: term,

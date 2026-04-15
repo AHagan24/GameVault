@@ -85,12 +85,6 @@ npm run dev
 
 ---
 
-## 📸 Demo
-
-*Add screenshots or a demo link here if needed*
-
----
-
 ## 👤 Author
 
 **Addison Hagan**
